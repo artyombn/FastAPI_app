@@ -1,0 +1,12 @@
+APP_NAME=FastAPI_app
+DEBUG=True
+DB_USER=user
+DB_PASSWORD=password
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=dbname
+
+POSTGRES_USER=admin
+POSTGRES_PASSWORD=password
+POSTGRES_DB=dbname
+PGDATA=/var/lib/postgresql/data/pgdata
