@@ -1,10 +1,11 @@
-from sqlalchemy.orm import Mapped, mapped_column
-from database import Base
+from __future__ import annotations
+from typing import List
+
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from models.database import Base
 
 
 class User(Base):
-    __tablename__ = "user"
-
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True, index=True)
     username: Mapped[str] = mapped_column(index=True, unique=True)
     email: Mapped[str] = mapped_column(index=True, unique=True)
@@ -12,4 +13,5 @@ class User(Base):
     last_name: Mapped[str]
     hashed_password: Mapped[str]
     is_superuser: Mapped[bool] = mapped_column(default=False)
+    post: Mapped[List["Post"]] = relationship(back_populates="user")
 

@@ -12,3 +12,7 @@ async_session_maker = async_sessionmaker(
 
 class Base(AsyncAttrs, DeclarativeBase):
     __abstract__ = True
+
+    @declared_attr
+    def __tablename__(cls):
+        return f"{cls.__name__.lower()}s"
