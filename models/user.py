@@ -13,5 +13,3 @@ class User(Base):
     hashed_password: Mapped[str]
     is_superuser: Mapped[bool] = mapped_column(default=False)
 
-
-
