@@ -20,7 +20,7 @@ services:
     env_file:
       - .env
     ports:
-      - "5430:5432"
+      - "5432:5432"
     volumes:
       - ./pgdata:/var/lib/postgresql/data/pgdata
     deploy:
