@@ -1,8 +1,9 @@
 APP_NAME=FastAPI_app
-DEBUG=True
-DB_USER=user
+DOCKER=True
+DB_USER=admin
 DB_PASSWORD=password
-DB_HOST=localhost
+DB_HOST_DOCKER=postgres
+DB_HOST_LOCAL=localhost
 DB_PORT=5432
 DB_NAME=dbname
 
