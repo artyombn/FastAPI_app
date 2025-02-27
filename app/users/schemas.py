@@ -5,7 +5,7 @@ class UserBase(BaseModel):
     email: EmailStr = Field(description="Use a valid email")
     first_name: str = Field(min_length=2, max_length=15, description="First name must be between 2 and 15 symbols")
     last_name: str = Field(min_length=2, max_length=15, description="Last name must be between 2 and 15 symbols")
-    hashed_password: str
+    password: str = Field(min_length=5, max_length=50, description="Password must be between 5 and 50 symbols")
 
 class UserCreate(UserBase):
     """
