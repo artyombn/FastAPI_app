@@ -11,7 +11,7 @@ class User(Base):
     email: Mapped[str] = mapped_column(index=True, unique=True)
     first_name: Mapped[str]
     last_name: Mapped[str]
-    hashed_password: Mapped[str]
+    password: Mapped[str]
     is_superuser: Mapped[bool] = mapped_column(default=False)
     post: Mapped[List["Post"]] = relationship(back_populates="user")
 
