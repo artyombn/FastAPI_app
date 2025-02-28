@@ -26,3 +26,7 @@ class User(UserBase):
 class UserAuth(BaseModel):
     email: EmailStr = Field(description="Use a valid email")
     password: str = Field(min_length=5, max_length=50, description="Password must be between 5 and 50 symbols")
+
+class TokenResponse(BaseModel):
+    access_token: str = "token"
+    refresh_token: str = None

@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.config import logger
 from app.dependencies.db_session import get_async_session
 from app.users.auth import get_password_hash, create_access_token, get_current_user_id
-from app.users.schemas import UserCreate, UserOutput, UserAuth, User
+from app.users.schemas import UserCreate, UserOutput, UserAuth, User, TokenResponse
 from app.users.services import UserServices
 
 
@@ -34,7 +34,8 @@ async def register_user(user_data: UserCreate, session: AsyncSession = Depends(g
     await UserServices.register_user(user_dict, session)
     return {"message": "Registration successful"}
 
-@router.post("/login", summary="Login", response_model=dict)
+
+@router.post("/login", summary="Login", response_model=TokenResponse)
 async def auth_user(response: Response, user_data: UserAuth, session: AsyncSession = Depends(get_async_session)):
     check = await UserServices.authenticate_user(email=user_data.email, password=user_data.password, session=session)
     if check is False:
@@ -54,3 +55,8 @@ async def get_current_user(session: AsyncSession = Depends(get_async_session), u
 @router.get("/me", summary="My profile", response_model=UserOutput)
 async def get_my_profile(user: User = Depends(get_current_user)):
     return user
+
+@router.post("/logout", summary="Logout", response_model=dict)
+async def logout_user(response: Response):
+    response.delete_cookie(key="users_access_token")
+    return {"massage": "Logout successful"}
