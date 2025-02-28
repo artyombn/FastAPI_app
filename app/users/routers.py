@@ -4,7 +4,7 @@ from fastapi import APIRouter, HTTPException, Response, status, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.dependencies.db_session import get_async_session
-from app.users.auth import get_password_hash, authenticate_user, create_access_token
+from app.users.auth import get_password_hash, create_access_token
 from app.users.schemas import UserCreate, UserOutput, UserAuth
 from app.users.services import UserServices
 
@@ -35,7 +35,8 @@ async def register_user(user_data: UserCreate, session: AsyncSession = Depends(g
 
 @router.post("/login", summary="Login", response_model=dict)
 async def auth_user(response: Response, user_data: UserAuth, session: AsyncSession = Depends(get_async_session)):
-    check = await authenticate_user(email=user_data.email, password=user_data.password, session=session)
+    check = await UserServices.authenticate_user(email=user_data.email, password=user_data.password, session=session)
+    print(f"Check = {check}")
     if check is False:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                             detail='Incorrect username or password')

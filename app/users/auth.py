@@ -1,12 +1,10 @@
 from jose import jwt
 from passlib.context import CryptContext
 from datetime import datetime, timedelta, timezone
-
-from pydantic import EmailStr
-from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import Request, HTTPException, status
 
 from app.config import settings
-from app.users.services import UserServices
+
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -24,13 +22,12 @@ def create_access_token(data: dict) -> str:
     encode_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
     return encode_jwt
 
-async def authenticate_user(email: EmailStr, password: str, session: AsyncSession):
-    user = await UserServices.find_one_or_none(email=email, session=session)
-    if not user or not verify_password(
-            plain_password=password,
-            hashed_password=user.password,
-    ):
-        return False
-    return user
+def get_token(request: Request):
+    token = request.cookies.get('users_access_token')
+    if not token:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Token not found')
+    return token
+
+
 
 

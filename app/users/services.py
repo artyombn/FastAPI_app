@@ -4,7 +4,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.database import async_session_maker
 from app.models.user import User as User_db
+from app.users.auth import verify_password
 from app.users.schemas import UserCreate
+
+from pydantic import EmailStr
 
 
 class UserServices:
@@ -24,6 +27,16 @@ class UserServices:
         user = User_db(**user_dict)
         session.add(user)
         await session.commit()
+        return user
+
+    @classmethod
+    async def authenticate_user(cls, email: EmailStr, password: str, session: AsyncSession):
+        user = await cls.find_one_or_none(email=email, session=session)
+        if not user or not verify_password(
+                plain_password=password,
+                hashed_password=user.password,
+        ):
+            return False
         return user
 
 
