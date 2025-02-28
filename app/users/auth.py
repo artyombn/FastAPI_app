@@ -1,10 +1,9 @@
-from jose import jwt
+from jose import jwt, JWTError
 from passlib.context import CryptContext
 from datetime import datetime, timedelta, timezone
-from fastapi import Request, HTTPException, status
+from fastapi import Request, HTTPException, status, Depends
 
-from app.config import settings
-
+from app.config import settings, logger
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -28,6 +27,26 @@ def get_token(request: Request):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Token not found')
     return token
 
+
+def get_current_user_id(token: str = Depends(get_token)):
+    logger.debug(f"TOKEN = {token}")
+    try:
+        logger.debug(f"SECRET_KEY = {settings.SECRET_KEY}")
+        logger.debug(f"ALGORITHM = {settings.ALGORITHM}")
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+        logger.debug(f"PAYLOAD = {payload}")
+    except JWTError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Invalid token')
+
+    expire = payload.get('exp')
+    expire_time = datetime.fromtimestamp(int(expire), tz=timezone.utc)
+    if (not expire) or (expire_time < datetime.now(timezone.utc)):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Token expired')
+
+    user_id = payload.get('sub')
+    if not user_id:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='User ID not found')
+    return user_id
 
 
 

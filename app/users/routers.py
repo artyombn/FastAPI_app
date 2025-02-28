@@ -3,9 +3,10 @@ from typing import List
 from fastapi import APIRouter, HTTPException, Response, status, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.config import logger
 from app.dependencies.db_session import get_async_session
-from app.users.auth import get_password_hash, create_access_token
-from app.users.schemas import UserCreate, UserOutput, UserAuth
+from app.users.auth import get_password_hash, create_access_token, get_current_user_id
+from app.users.schemas import UserCreate, UserOutput, UserAuth, User
 from app.users.services import UserServices
 
 
@@ -36,10 +37,20 @@ async def register_user(user_data: UserCreate, session: AsyncSession = Depends(g
 @router.post("/login", summary="Login", response_model=dict)
 async def auth_user(response: Response, user_data: UserAuth, session: AsyncSession = Depends(get_async_session)):
     check = await UserServices.authenticate_user(email=user_data.email, password=user_data.password, session=session)
-    print(f"Check = {check}")
     if check is False:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                             detail='Incorrect username or password')
-    access_token = create_access_token(data={"sub": user_data.email})
+    access_token = create_access_token(data={"sub": str(check.id)})
     response.set_cookie(key="users_access_token", value=access_token, httponly=True)
     return {'access_token': access_token, 'refresh_token': None}
+
+async def get_current_user(session: AsyncSession = Depends(get_async_session), user_id: int = Depends(get_current_user_id)):
+    user = await UserServices.get_current_user_db(session=session, user_id=user_id)
+    logger.debug(f"USER: {user}")
+    if not user:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
+    return user
+
+@router.get("/me", summary="My profile", response_model=UserOutput)
+async def get_my_profile(user: User = Depends(get_current_user)):
+    return user

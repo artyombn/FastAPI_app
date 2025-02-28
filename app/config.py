@@ -1,5 +1,12 @@
 import os
+import logging
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+
 
 class Settings(BaseSettings):
     APP_NAME: str

@@ -18,8 +18,6 @@ class UserOutput(UserBase):
     """
     password: str = Field(min_length=5, max_length=100, description="Password must be between 5 and 50 symbols")
 
-
-
 class User(UserBase):
     """
     The main User cls

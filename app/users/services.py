@@ -1,13 +1,9 @@
 from sqlalchemy import select
-from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
+from pydantic import EmailStr
 
-from app.models.database import async_session_maker
 from app.models.user import User as User_db
 from app.users.auth import verify_password
-from app.users.schemas import UserCreate
-
-from pydantic import EmailStr
 
 
 class UserServices:
@@ -20,6 +16,11 @@ class UserServices:
     @classmethod
     async def find_one_or_none(cls, email: str, session: AsyncSession):
         user = await session.execute(select(User_db).where(User_db.email == email))
+        return user.scalar_one_or_none()
+
+    @classmethod
+    async def find_one_or_none_by_id(cls, user_id: int, session: AsyncSession):
+        user = await session.execute(select(User_db).where(User_db.id == user_id))
         return user.scalar_one_or_none()
 
     @classmethod
@@ -38,5 +39,18 @@ class UserServices:
         ):
             return False
         return user
+
+
+    @classmethod
+    async def get_current_user_db(cls, user_id: int, session: AsyncSession):
+        user = await cls.find_one_or_none_by_id(user_id=int(user_id), session=session)
+        return user
+
+
+
+
+
+
+
 
 
