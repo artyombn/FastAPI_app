@@ -29,4 +29,4 @@ class UserAuth(BaseModel):
 
 class TokenResponse(BaseModel):
     access_token: str = "token"
-    refresh_token: str = None
+    refresh_token: str | None = None
